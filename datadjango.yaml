@@ -1,0 +1,36 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: datadjango
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: datadjango
+  template:
+    metadata:
+      labels:
+        app: datadjango
+    spec:
+      containers:
+        - name: datadjango
+          image: cognetrytestrepo.azurecr.io/datadjango:dev
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+      restartPolicy: Always
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: datadjango
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: 8000
+      protocol: TCP
+  selector:
+    app: datadjango
+
+---
