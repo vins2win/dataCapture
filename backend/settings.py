@@ -86,14 +86,13 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'datacapturedb01',
-        'USER': 'cogdevdba',
-        'PASSWORD': 'Cogdev@123',
-        'HOST': 'cogdevdb01.postgres.database.azure.com',
+        'NAME': 'cognetry_ai_data',
+        'USER': 'admin',
+        'PASSWORD': SECRETS['DB_PASSWORD'],
+        'HOST': '127.0.0.1',
         'PORT': '5432'
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
