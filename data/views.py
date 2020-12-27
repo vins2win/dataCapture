@@ -46,6 +46,7 @@ def authenticate_user(request):
     request_body = json.loads(request.body)
     username = request_body['username']
     password = request_body['password']
+    print(username, password)
 
     # aes = AESCipher(settings.SECRETS["CRYPT_KEY"])
     # print(aes.decrypt(password))
@@ -61,7 +62,7 @@ def authenticate_user(request):
             status=200
         )
 
-    return HttpResponse('{"status": "failed"}', status=200)
+    return HttpResponse('{"status": "failed", "message": "User not found"}', status=200)
 
 @csrf_exempt
 def category(request):
@@ -87,7 +88,6 @@ def category(request):
         return HttpResponse(serializers.serialize('json', item_categories))
     else:
         return HttpResponse('{"status": "failed", "message": "Invalid request type"}')
-    return HttpResponse('{"status": "failed"}', status=200)
 
 @csrf_exempt
 def shop(request):
@@ -114,7 +114,6 @@ def shop(request):
         return HttpResponse(serializers.serialize('json', shops), status=200)
     else:
         return HttpResponse('{"status": "failed", "message": "Invalid request type"}')
-    return HttpResponse('{"status": "failed"}', status=200)
 
 @csrf_exempt
 def item(request):
@@ -127,35 +126,36 @@ def item(request):
                 shop = Shop.objects.get(pk=request_body['shop_id'])
                 item_category = ItemCategory.objects.get(pk=request_body['category_id'])
                 user = User.objects.get(pk=request_body['user_id'])
-                item = Item(
-                    shop=shop,
-                    category=item_category,
-                    user=user,
-                    name=request_body['name'],
-                    price=request_body['price'],
-                    quantity=request_body['quantity'],
-                    barcode=request_body['barcode'],
-                    quantity_type=request_body['quantity_type'],
-                    manufacturer=request_body.get('manufacturer', None),
-                    brand=request_body.get('brand', None),
-                    manufacturing_date=request_body.get('manufacturing_date', None),
-                    expiry_date=request_body.get('expiry_date', None),
-                    ingredients=request_body.get('ingredients', None),
-                    allergens=request_body.get('allergens', None),
-                    remarks=request_body.get('remarks', None),
-                    images=request_body['images'],
-                )
-                item.save()
-                return HttpResponse('{"status": "success"}')
+                if shop and item_category and user:
+                    item = Item(
+                        shop=shop,
+                        category=item_category,
+                        user=user,
+                        name=request_body['name'],
+                        price=request_body['price'],
+                        quantity=request_body['quantity'],
+                        barcode=request_body['barcode'],
+                        quantity_type=request_body['quantity_type'],
+                        manufacturer=request_body.get('manufacturer', None),
+                        brand=request_body.get('brand', None),
+                        manufacturing_date=request_body.get('manufacturing_date', None),
+                        expiry_date=request_body.get('expiry_date', None),
+                        ingredients=request_body.get('ingredients', None),
+                        allergens=request_body.get('allergens', None),
+                        remarks=request_body.get('remarks', None),
+                        images=request_body['images'],
+                    )
+                    item.save()
+                    return HttpResponse('{"status": "success"}')
+                else:
+                    return HttpResponse('{"status": "failed", "message": "Invalid data"')
             else:
                 return HttpResponse(
-                    '{"status": "failed", "message": "Item category already exists"}'
+                    '{"status": "failed", "message": "Item already exists"}'
                 )
         else:
             return HttpResponse(
-                '{"status": "failed", "message": "Invalid data"}'
+                '{"status": "failed", "message": "Invalid request body"}'
             )
     else:
         return HttpResponse('{"status": "failed", "message": "Invalid request type"}')
-
-    return HttpResponse('{"status": "failed"}', status=200)
